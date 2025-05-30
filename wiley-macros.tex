@@ -1,0 +1,837 @@
+%% Below two lines have to be in the top 10 lines of the file. 
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
+
+%%xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+%% Set in Wiley style.
+
+\RequireXeTeX %Force XeTeX check
+
+%xxx\documentclass[oneside]{article}
+%\RequirePackage[oneside]{article}
+\LoadClass[oneside]{article}
+
+\RequirePackage{xstring}
+\RequirePackage{graphicx}
+\RequirePackage[strict]{changepage}
+\RequirePackage{etoolbox}
+\RequirePackage{textcomp} % for copyright sign
+\RequirePackage{lastpage}
+\RequirePackage{fancyhdr}
+\RequirePackage{enumitem}
+\RequirePackage{fancyvrb}  % So can use \begin{Verbatim}. . .\end{Verbatim} if want.
+\RequirePackage[x11names]{xcolor}
+\RequirePackage{ifthen}
+\RequirePackage{listofitems}
+\RequirePackage{expl3}
+\RequirePackage{trimspaces}
+%%%
+\AtBeginDocument{\raggedright}
+\parindent=0pt
+\parskip=.5pc
+
+
+%% Set journal name:
+\def\journalname#1{\def\thejournalname{#1}}
+\journalname{Please set Journal Name by using {\tt\string\journalname}}
+
+
+%xxx REMOVE from non-wiley fork  AND MOVE TO TOP OF CLS FILE <or common file>
+%
+%
+%xx Need BibLaTeX for APA style.  DC
+\RequirePackage{apacite}
+%\RequirePackage{natbib}
+\let\cite\shortcite %xx So get et al. with three authors the first time.
+%\let\citep\cite %xx A natbib command.
+\let\citet\shortciteA %xx Ditto.
+%
+\bibliographystyle{apacite}
+
+\RequirePackage{url}
+
+
+%% Table Footnotes 
+
+\def\tablenotemark#1{\rlap{$^{\rm #1}$}}   %xxxx   
+
+\long\def\tablenotetext#1#2{\vtop{\vskip2pt   %xxxx
+\uncentering\noindent\setbox0=\hbox{#1}%
+\hskip\saveparindent\ifdim\wd0>1pt
+$^{\rm #1}$ \fi{\tablenotefont\ignorespaces #2}\vskip1sp}}
+
+\long\def\tablecomments#1{\vbox{\uncentering  %xxxx
+\vskip2pt{\parindent\saveparindent\def\\ {\vskip1sp}\tablenotefont #1}
+\vskip 1sp}}
+
+\let\tablecomment\tablecomments  %xxxx  allowing these?
+\def\tablenotes{\uncentering\vskip4pt   %xxxx huh?
+\tablenotefont\noindent\hskip\saveparindent\ignorespaces}
+\def\endtablenotes{\vskip1sp}
+
+\def\uncentering{%   %xxxx
+  \let\\\@normalcr
+  \rightskip0pt \leftskip0pt
+  \parindent\saveparskip \parfillskip0pt plus 1fil\relax}
+
+%xxx  end of REMOVE AND MOVE TO TOP OF CLS FILE  <or...
+
+
+
+
+%\RequirePackage{stringstrings}
+
+\def\articlenumber{\phantom{XX.XX/XX/XXXXEAXXXXXX}}  % Bogus sample number.  Made invisible by request.
+
+
+
+% Some definitions used in all styles.
+%
+\def\authorrunninghead#1{}%\def\theauthorrunninghead{\uppercase{#1}} }%xxx\def\authorrunninghead#1{}} % Called with \initialedfirstauthor in \authors. Disable.
+%\def\theauthorrunninghead{\firstauthorinitialednameallcaps}
+%\def\theauthorrunninghead#1{\makeinitialedfirstauthor \expandafter\MakeUppercase\expandafter{\firstauthorinitialedname}}
+%\def\theauthorrunninghead{\authorrunninghead{}}
+%xxx\def\authorrunninghead#1{}} % Called with \initialedfirstauthor in \authors. Disable. %xxx
+                           
+\def\titlerunninghead#1{}%{\def\therunningheadtitle{#1}}  % Ignored in sample published version.
+%
+\def\title#1{\def\thetitle{#1}}
+\def\authors#1{\def\theauthors{#1} \makeinitialedfirstauthor}%\makeinitialedfirstauthor \authorrunninghead{\firstauthorinitialedname}}
+\def\authoraddr#1{\def\theauthoraddr{#1}}  
+%
+%
+\newcounter{affiliationcounter} \setcounter{affiliationcounter}{0}
+%
+\def\affiliation#1#2{%
+    \stepcounter{affiliationcounter} %\theaffiliationcounter (prints counter value)
+    \appto{% Add command to \authoraffiliations hook
+        %\ifnum\value{affiliationcounter}>1,\fi  %xx
+        \theauthoraffiliations}{$^{#1}$#2\ } 
+}  
+
+%\def\authoraddress#1{%
+%%%xx\typeout{^^J^^J Inside authoraddress ^^J^^J}
+%    \def\theauthoraddrress{#1}%
+%%%    \findwords[v]{\theauthoraddress}{SI~Corresponding~author:~}
+%%%    \ifnum\theresult>0
+%%%        \removeword{\theauthoraddress}
+%%%        \removeword{\theauthoraddress}
+%%%        \removeword{\theauthoraddress}
+%%%    \fi
+%}
+%\let\authoraddr=\authoraddress
+
+%
+%
+\RequirePackage{marginnote}
+%% Put margin on left side only.
+%% From: https://tex.stackexchange.com/questions/466512/marginpar-always-on-left-side
+%
+%\makeatletter
+%
+%%\usepackage[a4,center,cam,info,]{crop}
+%%
+%%\setlength{\paperheight}{9truein}%
+%%\setlength{\paperwidth}{7truein}%
+%%
+%%\setlength\textwidth{30pc}
+%%\setlength\textheight{40pc}
+%%
+%%\setlength\marginparwidth{48\p@}%
+%%
+%%\setlength\oddsidemargin{5pc}
+%%\addtolength\oddsidemargin{-1in}    % subtract out the 1 inch driver margin
+%%\addtolength\oddsidemargin{\marginparwidth}%
+%%\addtolength\oddsidemargin{\marginparsep}%
+%
+%%\setlength\@tempdima{\paperwidth}
+%%\addtolength\@tempdima{-\textwidth}
+%%\addtolength\@tempdima{-5pc}
+%
+%%\setlength\evensidemargin{\@tempdima}
+%%\addtolength\evensidemargin{-1in}
+%
+%\reversemarginpar
+%\@mparswitchfalse%
+%
+%\makeatother
+%
+%
+%
+%% Changes to Tufte defs.
+%
+%
+%  Fonts
+%
+%XX https://tex.stackexchange.com/questions/464406/how-best-to-use-stix2-in-a-document   REMOVE
+%XX https://tex.stackexchange.com/questions/43806/what-does-font-name-in-the-fontspec-package-refer-to-on-a-mac
+%\usepackage[T1]{fontenc}
+\usepackage{amsmath} 
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX, Path=./fonts/,} 
+\usepackage{xltxtra}
+\usepackage{xunicode}
+%\usepackage{stix2}
+%\normalfont
+\usepackage{unicode-math}
+%
+%
+\setmathfont{STIXTwoMath-Regular}[
+Extension={.otf},
+Path=./fonts/,
+Scale=1]
+%
+\def\STIXTwo{%
+\setmainfont{STIXTwoText}[
+Extension={.otf},
+Path=./fonts/,
+UprightFont={*-Regular},
+BoldFont={*-Bold},
+ItalicFont={*-Italic},
+BoldItalicFont={*-BoldItalic}]
+}
+\STIXTwo
+
+\setsansfont[Mapping=tex-text,Scale=.9]{FreeSans}%{Helvetica Neue}
+\setmonofont[Mapping=tex-text,Scale=1.05]{FreeMono}
+
+%\input ./stix2-otf/STIXTwoText-Regular.otf
+
+%% Set the font sizes and baselines to match Wiley's journal.
+%
+%% 22/22 \Huge (journal name)
+%% 15/16 \LARGE (title)
+%% 12/12 \Large (abstract heads)
+%% 11/12 \large (section, back matter heads) 
+%%
+%% 9/12 \normalsize (author list 9/10.8, subsections down to paragraph 9/11)
+%% 8/10 \small  (author footnote, tables, table footnotes)
+%% 7/9 \footnotesize (margin pars, references )
+%%
+%% some more missing.  %xxx
+
+% The font sizes
+%
+\makeatletter
+% normalsize
+\renewcommand\normalsize{% 9/12
+   \@setfontsize\normalsize{9}{12}%
+   \abovedisplayskip 8.5pt \@plus3pt \@minus4pt
+   \abovedisplayshortskip0pt \@plus2pt
+   \belowdisplayshortskip 4pt \@plus2pt \@minus2pt
+   \let\@listi\@listI
+}   %
+\normalbaselineskip=12pt 
+\normalsize 
+
+% leading variation on normalsize
+\newcommand\authornormalsize{% 9/10.6
+   \@setfontsize\normalsize{9}{10.8}%
+   \abovedisplayskip 8.5pt \@plus3pt \@minus4pt
+   \abovedisplayshortskip0pt \@plus2pt
+   \belowdisplayshortskip 4pt \@plus2pt \@minus2pt
+   \let\@listi\@listI
+}   %
+
+
+% small
+\renewcommand\small{% 8/10
+   \@setfontsize\small{8}{10}%%
+%   \abovedisplayskip 6pt \@plus2pt \@minus4pt
+%   \abovedisplayshortskip 0pt \@pluspt
+%   \belowdisplayshortskip 3pt \@pluspt \@minus2pt
+%   \def\@listi{\leftmargin\leftmargini
+%               \topsep 3pt \@pluspt \@minuspt
+%               \parsep 2pt \@pluspt \@minuspt
+%               \itemsep \parsep}%
+%   \belowdisplayskip \abovedisplayskip
+}
+
+% footnotesize
+\renewcommand\footnotesize{% 7/9
+   \@setfontsize\footnotesize{7}{9}%
+%   \abovedisplayskip 5pt \@plus2pt \@minus3pt
+%   \abovedisplayshortskip 0pt \@pluspt
+%   \belowdisplayshortskip 3pt \@pluspt \@minus2pt
+%   \def\@listi{\leftmargin\leftmargini
+%               \topsep 3pt \@pluspt \@minuspt
+%               \parsep 2pt \@pluspt \@minuspt
+%               \itemsep \parsep}%
+%   \belowdisplayskip \abovedisplayskip
+}
+
+% scriptsize
+\renewcommand\scriptsize{\@setfontsize\scriptsize{7}{8}} % 7/8
+\newcommand\bibscriptsize{\@setfontsize\scriptsize{7}{9}} % 7/9    % scriptsize with different leading.    %xxx but this is footnotesize
+% tiny
+\renewcommand\tiny{\@setfontsize\tiny{5}{6}}% 5/6 
+% large
+\renewcommand\large{\@setfontsize\large{11}{12}} % 11/12
+% Large
+\renewcommand\Large{\@setfontsize\Large{12}{12}} % 12/12
+% LARGE
+\renewcommand\LARGE{\@setfontsize\LARGE{14}{16}} % 14/16 
+% huge
+\renewcommand\huge{\@setfontsize\huge{15}{18}} % 15/18
+% Huge
+\renewcommand\Huge{\@setfontsize\Huge{22}{22}} % 22/22 
+
+\makeatother
+
+
+% The fonts using the above sizes
+%
+%xxx\renewcommand{\normalfont}{\normalsize}%\fontspec{STIXTwoText-Regular}}
+
+\newcommand{\authornormalfont}{\normalfont\authornormalsize\bfseries}%xx \fontspec{STIXTwoText-Bold}}
+\newcommand{\titlefont}{\normalfont\huge\bfseries}%fontspec{STIXTwoText-Bold}}
+\newcommand{\headerjournalfont}{\normalfont\LARGE\bfseries}
+\newcommand{\abstractheadfont}{\normalfont\Large\bfseries}% \fontspec{STIXTwoText-Bold}}
+\newcommand{\sectionfont}{\normalfont\large\bfseries}%\fontspec{STIXTwoText-Bold}}
+\newcommand{\subsectionfont}{\normalfont\normalsize\bfseries}%\fontspec{STIXTwoText-Bold}}
+\newcommand{\authorfootnotesandtablesfont}{\normalfont\small\rmfamily}%\fontspec{STIXTwoText-Regular}}
+\newcommand{\marginparreferencesfont}{\normalfont\footnotesize\rmfamily}%\fontspec{STIXTwoText-Regular}}
+\newcommand{\marginparreferencesheadsfont}{\normalfont\footnotesize\bfseries}%\fontspec{STIXTwoText-Bold}}
+\let\captionfont\marginparreferencesfont
+\let\captionlabelfont\marginparreferencesheadsfont
+\let\tablenotefont\captionfont
+%
+\newcommand{\journalfont}{\Huge\fontspec{QTHelvet-Black}}
+
+\gdef\fontblue{SteelBlue4}
+
+
+
+%% Set page layout geometry
+%
+\RequirePackage[%
+letterpaper,
+%asymmetric,
+bindingoffset=0pt,
+left=14.5pc,   % 3pc space on left, 2pc on right, so margin text box should be 9.5pc.
+right=3pc,
+top=4pc,
+headsep=1pc,
+textwidth=33.5pc,
+marginparsep=0pc, % Larger number moves margin text box to left.
+marginparwidth=11.5pc,
+textheight=48pc,     %xxx 50pc,
+headheight=27.65pt, %\baselineskip,
+footskip=2pc,%13pt, %10pt,
+bottom=4pc,
+includehead,
+includefoot,
+textheight=48pc,     %xxx 50pc,
+%xxx lines=20,
+%showframe
+]{geometry}
+%
+
+% For lists.
+\setlength\leftmargini   {1pc}
+\setlength\leftmarginii  {1pc}
+\setlength\leftmarginiii {1pc}
+\setlength\leftmarginiv  {1pc}
+\setlength\leftmarginv   {1pc}
+\setlength\leftmarginvi  {1pc}
+\setlength\labelsep      {.5pc}
+\setlength\labelwidth    {\leftmargini}
+\addtolength\labelwidth{-\labelsep}
+
+
+
+% Margin pars
+%
+% Separation marginpars by 2 lines' worth of space.
+\setlength\marginparpush{2\baselineskip}%{10pt}
+
+% A minipage for margin pars, with adjustable vertical size.
+%
+% #1: minipage height
+% #2: minipage contents
+\newcommand{\marginminipage}[2]{%
+    \vspace*{-20pt}
+    %\fbox{%
+    %%%%
+    \begin{minipage}[t][#1][t]{9.5pc}%  % [vertical, size]{}{horizontal size} 
+        #2%
+    \end{minipage}
+   % }% end fbox
+}
+
+
+
+% Sections
+%
+%
+% spec fonts, etc.
+\makeatletter
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {.1ex \@plus.2ex}%
+                                   {\sectionfont\color{\fontblue}}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {.1ex \@plus .2ex}%
+                                     {\subsectionfont \color{\fontblue}}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {.1ex \@plus .2ex}%
+                                     {\subsectionfont \color{\fontblue}}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                    {1.25ex \@plus1ex \@minus.2ex}%
+                                    {-1em}%
+                                    {\authornormalfont \color{\fontblue}}}
+%\newcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+%                                       {3.25ex \@plus1ex \@minus .2ex}%
+%                                       {-1em}%
+%                                      {\authornormalsize}}
+\makeatother
+
+% Put a period after all section labels, e.g., ``1.2.'' instead of ``1.2''
+\makeatletter
+\renewcommand\@seccntformat[1]{\csname the#1\endcsname.\ }
+\makeatother
+
+
+
+%  Bibliography section
+%
+% Change the bibliography's type size.
+\renewcommand\bibliographytypesize{\bibscriptsize}
+
+
+% Add a margin par to the bibliography's section command.
+%
+\newcommand{\bibpagemarginpar}{%
+    \reversemarginpar\marginpar{%
+        \marginminipage{12pt}{%xxx  MAKE number A MACRO
+           \raggedright
+           \vspace*{9pt}
+           \firstpagemarginentry{Acknowledgements}{\textcolor{red}{\textcolor{red}{Your acknowledgements will appear here.}}}            %xxx Need a hook-in.  red
+          \vfill
+      }
+   }
+}
+%
+%
+% Add a marginpar to the bibliography.  Using article.cls definition of thebibliography.
+\makeatletter
+\renewenvironment{thebibliography}[1]
+     {\FloatBarrier
+      \section*{\refname}%
+      \@mkboth{\MakeUppercase\refname}{\MakeUppercase\refname}%
+      \bibpagemarginpar%xx  Add a margin par.
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+              \setlength{\itemsep}{0pt}%xx Reduce the default separation between bib items.  See https://texfaq.org/FAQ-compactbib
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+\makeatother
+
+
+% All pages.
+
+% Parse authors list to build running footer.
+%
+\newcommand{\authorspostfix}{} % If one author, will remain empty; it more than one, will contain ``et al.''
+
+\newcommand{\authorendmarker}{///}
+
+
+%xxx% See: https://tex.stackexchange.com/questions/150665/trim-spaces-in-a-macro-with-expl3
+%\NewDocumentCommand{\trimsurroundingspaces}{m}
+% {
+%  \tl_trim_spaces:N #1
+% }
+%\ExplSyntaxOff
+
+
+% Count the authors and initialize whether to add ``et al.'' to the end of the typeset list.
+\newcommand{\countauthors}{%
+    \begingroup
+        \def\affil{\authorendmarker}
+        \def\thanks{\authorendmarker}
+        %
+	\setsepchar{,/ }% Separate comma list of authors (first level) and names in these authors (second level).
+     	\renewcommand{\authorspostfix}{}  % Initialize the postfix.
+	%
+	\greadlist*\authorslist{\theauthors}% Starred version of \greadlist removes spaces at the beginning and the end of input list.
+        %xxx \showitems\authorslist \par %xxx for debugging.
+        %
+        % Add ``et al.'' to end of authors list if there are more than one.
+        \ifthenelse{\authorslistlen > 1} % Adding ``len'' to \authors command gives its length. Very core TeXish construction.
+            {
+                \gdef\authorspostfix{ et al.} %xxx\typeout{^^J More than one author.^^J}}
+             }
+            {}
+    \endgroup
+} % end \countauthors
+
+
+% Build a version of the first author with leading initials instead of names.
+%
+% A way of adding to a string that avoids infinate recursion.
+\newcommand{\addtostring}[2]{%
+%     \makeatletter
+%         \g@addto@macro#1{#2}
+%     \makeatother
+      \expandafter\def\expandafter#1\expandafter{#1{}#2}
+%	\edef#1{#1{}#2}
+}
+%
+% Does not take into account unhyphenated double-barreled last names (including  last-name joiners [e.g., ``de'' or `y']; 
+%    see https://en.wikipedia.org/wiki/Double-barrelled_name), unreversed Chinese names, preferred initializations/capitalizations, 
+%    and probably a lot of other instances.
+\newcommand{\makeinitialedfirstauthor}{%
+    \begingroup
+        \def\affil{\authorendmarker}
+        \def\thanks{\authorendmarker}
+        %
+	%xxx\greadlist\firstauthor{\authorslist[1]}  % Can access each multi-word list element, defined as separated by commas.  Get first word of this.
+	%xxx\itemtomacro\authorslist[1]\firstauthor % Can access each multi-word list element, defined as separated by commas.  Get first word of this.
+	%
+	\countauthors
+	%
+	\itemtomacro\authorslist[1,1]\firstauthorfirstword
+	%xxx first author's first word: \firstauthorfirstword \par %xxx
+	%
+	\itemtomacro\authorslist[1,2]\firstauthorsecondword
+	%xxx first author's second word: \firstauthorsecondword \par  %xxx
+	%
+	% Rest of first author's name.
+	\itemtomacro\authorslist[1]\firstauthorfullnamerest
+	%xxx first author's full name, rest of: \firstauthorfullnamerest \par  %xxx
+	%
+	% Get the substring between the second name and any commands, the latter which presumably come after the last name.
+        \def\firstauthorlastname{\StrBetween{\firstauthorfullnamerest}{\firstauthorsecondword}{\authorendmarker}} 	% (xstring)
+	%xxxfirst author's last name before trimming spaces: \fbox{\firstauthorlastname} \par  %xxx
+	%xx\trimsurroundingspaces{\firstauthorlastname}
+	%xxxmakeatletter \trim@spaces@in\firstauthorlastname \makeatother
+	%xxx\makeatletter \trim@pre@space@in\firstauthorlastname \makeatother
+	%xxx first author's last name after trimming spaces: \fbox{\firstauthorlastname} \par  %xxx
+        %
+	% Extract first character from the words to be turned into initials. (xstring)
+	\def\firstauthorfirstinitial{\StrChar{\firstauthorfirstword}{1}}  % Could have written as: \StrChar{\firstauthorfirstword}{1}[\firstauthorfirstinitial]
+	%xxx first author's first initial: \firstauthorfirstinitial \par %xxx
+	\def\firstauthorsecondinitial{\StrChar{\firstauthorsecondword}{1}}  % Could have written as: \StrChar{\firstauthorsecondword}{1}[\firstauthorsecondinitial]
+	%xxx first author's second initial: \firstauthorsecondinitial \par  %xxx
+        %
+        	% How many words are in the first author name?
+	\def\firstauthornumberofwords{\listlen\authorslist[1]}
+	%xxx number of words in first author's name: `\firstauthornumberofwords' \par
+	%
+	\newcommand{\firstauthorinitialedname}{\firstauthorfirstinitial.} % By default, we turn into an initial the first author's first name.
+	%
+	% If at least 3 words in author's name, we will produce 2 initials; if 2, will produce only one. 
+        \ifthenelse{\numexpr\firstauthornumberofwords > \numexpr 2}
+            { 
+                 \addtostring{\firstauthorinitialedname}{\firstauthorsecondinitial.} 
+            }
+            {}
+           
+        % Add on the last name/rest of the name.
+        \addtostring{\firstauthorinitialedname}{%\TrimSpaces{
+        \firstauthorlastname%}
+        \authorspostfix}
+        %xxx first author's name so far: bitchmusic.com  \par
+        \def\firstauthorinitialednameallcaps{\expandafter\MakeUppercase\expandafter{\firstauthorinitialedname}}
+ }
+
+
+% Headers and Footers
+%
+\usepackage{xpatch}
+
+\pagestyle{fancy}
+%
+\xpretocmd\headrule{\color{\fontblue}}{}{\PatchFailed}
+\xpretocmd\footrule{\color{\fontblue}}{}{\PatchFailed}
+%
+%
+\fancyhf{} % clear all header and footer fields
+\renewcommand{\headrulewidth}{1pt}  				
+\renewcommand{\footrulewidth}{1pt}  
+%
+% make headers and footers go across the whole page.
+% ignore compaints about the `e'.
+\fancyheadoffset[loh,reh]{11.5pc}
+\fancyfootoffset[loh,reh]{11.5pc}
+
+%
+% headers
+\def\raiseamount{1pc}
+%
+\fancyhead[L]{\includegraphics[height=2pc]{./agu-logo-small.pdf}}
+\fancyhead[C]{
+     \raisebox{\raiseamount}{
+         \headerjournalfont  
+        \textcolor{\fontblue}{
+             \thejournalname
+          }
+      }
+}
+\fancyhead[R]{\raisebox{\raiseamount}{\normalfont \textcolor{\fontblue}{\articlenumber}}}
+%
+% footers
+\fancyfoot[L]{\textcolor{\fontblue}{\firstauthorinitialedname}}%allcaps}}
+\def\allfooters{%
+    \normalfont
+    \fancyfoot[L]{\textcolor{\fontblue}{\firstauthorinitialedname}}%allcaps}}
+    \fancyfoot[R]{\textcolor{\fontblue}{\thepage\ of \pageref{LastPage}}}
+}  
+\allfooters
+%
+%% for the first page only
+%\fancypagestyle{firststyle} 
+%{
+%   \fancyhf{}
+%   \allfooters
+% }
+
+
+% Abstract and Plain Language Summary    % Original abstract environment written from scratch in TeX.
+%
+\def\abstracthead#1{{\abstractheadfont \textcolor{\fontblue}{#1\ }}}
+\def\abstractrule{{\color{\fontblue}\rule{\textwidth}{3pt}}}
+
+\newenvironment{plainlanguagesummary}
+    {
+        \par
+        \abstracthead{Plain Language Summary}
+        \begingroup
+    }
+    {
+        \par
+        \endgroup
+    }
+
+\renewenvironment{abstract}
+    {
+       {\color{\fontblue} \abstractrule}
+        \par
+        \abstracthead{Abstract}
+        \begingroup
+    }
+    %  Put optional Abstract Body here, including the optional Plain Language Summary environment {plainlanguagesummary}.
+    {
+        \par
+        \endgroup
+        \abstractrule
+        \vspace*{-18pt}
+    }
+    
+ \newenvironment{unnumbered}  %xxx no example in template file.
+     {
+         \begin{itemize}[leftmargin=18pt, labelwidth=0pt, labelsep=0pt, itemsep=\baselineskip, topsep=\baselineskip, label={}, listparindent=0pt]
+         \begingroup
+     }
+     {
+         \end{itemize}
+         \endgroup
+     }
+ 
+ 
+ %xxx no wide figures/tables
+ %xxx tell them about no footnotes
+ 
+ 
+%\renewenvironment{article} {}{}
+%
+%\else
+%\typeout{ELSE not published^^J}   %xxxxxxxxxxxxxxxxxxx
+%\fi
+%\endinput
+
+
+% Full-page-width area
+%
+\def\fullwidthmarginoverhang{-11.5pc}
+\def\absfullwidthmarginoverhang{11.5pc}
+%
+\newlength{\pagewidth}    \setlength{\pagewidth}{\textwidth}    \addtolength{\pagewidth}{\absfullwidthmarginoverhang}
+%
+\newenvironment{fullwidth}
+    {
+        % Widen left margin by width of margin text box plus marginpar. 
+        \begin{adjustwidth}{\fullwidthmarginoverhang}{}
+        \let\oldtextwidth\textwidth
+        \let\textwidth\pagewidth
+    }   
+    {
+        \let\textwidth\oldtextwidth
+        \end{adjustwidth}
+    }
+    
+
+%%%
+%% Title block
+%
+% Some more author stuff (defined differently in non-Wiley) for title block.
+%%xx Replace \affil stuff with below, from agujournal.cls:    DC
+%
+\def\affil#1{$^{#1}$\ignorespaces}
+\def\thanks#1{\textcolor{red}{(#1)}}   %xxx need to move to affil but how?
+%
+\renewcommand{\footnote}[1]{%
+%    %\ClassError {⟨class-name⟩} {⟨error-text⟩} {⟨help-text⟩}
+%    \ClassError {agutexSI2019} 
+%    {Your publisher does not allow footnotes.} 
+%    {You have to remove all footnotes and integrate them into your main text somehow.\stop}
+    \typeout{^^J^^J ERROR: AGU does not permit footnotes outside of the author affiliations.^^J^^J Ignoring.^^J^^J}
+    %xxx \show#1
+   \makeatletter \@gobble{#1} \makeatother
+}
+
+\renewcommand{\titlerunninghead}[1]{%
+%    %\ClassError {⟨class-name⟩} {⟨error-text⟩} {⟨help-text⟩}
+%    \ClassError {agutexSI2019} 
+   \typeout{^^J^^J ERROR: titlerunninghead command is ignored.^^J^^J Ignoring.^^J^^J}
+   \makeatletter \@gobble{#1} \makeatother
+}
+
+
+\def\marginparentrysep{1pc}
+%
+\newcommand{\firstpagemarginentry}[2]{%   
+  \marginparreferencesheadsfont \textcolor{\fontblue}{#1:}\\   
+  \marginparreferencesfont #2 \\
+  \vspace*{\marginparentrysep}
+}
+%
+\renewcommand{\maketitle}{%
+      \newpage
+      %
+      % Suppress running head, not footers.
+      \fancypagestyle{plain}{%
+          \renewcommand{\headrulewidth}{0pt}%
+          \fancyhf{}%
+          \allfooters      
+      }%
+      \thispagestyle{plain}
+      
+           %
+      \setlength{\parskip}{1pc}% space between entries
+      %
+      \vspace*{-4pc}  % back up top amount								%xx make a macro?
+      \vspace*{-1pc}  % back up headsep amount to top of paper
+      %
+      \vspace*{3pc}   % go down from page top first page amount
+      \rightline{\includegraphics[height=2pc]{./agu-logo-large.pdf}}
+      \vspace*{2pc}
+      %             
+      %
+      \newcommand{\firstpagemarginpar}{%
+            \reversemarginpar\marginpar{%
+                 \marginminipage{44.75pc}{%xxx constant?
+                       \raggedright
+                       \subsectionfont \textcolor{\fontblue}{RESEARCH ARTICLE}\par   
+                       \normalfont \articlenumber\par
+                       \vspace*{\marginparentrysep}
+                      %
+                       \firstpagemarginentry{Key Points}{Your list of key points here.}   %xxx hook in?
+                       \firstpagemarginentry{Correspondence to}{\theauthoraddr}
+                       \firstpagemarginentry{Citation}{Your citation here.}   % Wiley does this.
+
+% Per request, removed everything commented out except \vfill.                      
+                         % Received: XX XXX, XXXX\\
+                         % Accepted: XX XXX, XXXX\\
+                         % \vspace*{\marginparentrysep}
+                        
+%                       \firstpagemarginentry{Author Contributions}{%
+%                           \textcolor{red}{List of %xxx hook in?
+%                           author(s) in bold followed by a colon; contribution in regular font.\\
+%                           No extra space between entries. One author per line.}
+%                       }
+                       \vfill  
+%                       \marginparreferencesfont 
+%                           \begingroup
+%                           \color{\fontblue} \textcopyright\ XXXX The Authors. Earth and Space Science published by Wiley Periodicals LLC on behalf of American Geophysical Union.
+%                     
+%                                This is an open access article under the terms of the Creative Commons Attribution-NonCommercial-NoDerivs License, which permits use and   distribution in any medium, provided the original work is properly cited, the use is non-commercial and no modifications or adaptations are made.
+%                          \endgroup
+              }   % end marginminipage                                                                                                
+          } % end reversemarginpar/marginpar
+      } % end firstmarginpar
+              
+      \gdef\typesetjournal{\begin{fullwidth}  \journalfont \textcolor{\fontblue}{\thejournalname} \end{fullwidth}\par\vspace{1pc}}%xx need \sffamily, too.
+      %
+      \gdef\typesettitle{%
+            \parbox{0.9\textwidth}{%
+                  \begingroup
+                        \hyphenpenalty 10000\exhyphenpenalty 10000 \raggedright \sloppy \titlefont \textcolor{\fontblue}{\thetitle}
+                  \endgroup
+            }
+            \firstpagemarginpar
+            \par
+            \vspace*{6pt}
+         }
+      \gdef\typesetauthors{\authornormalfont\theauthors\par}
+      \gdef\typesetauthoraffiliations{\authorfootnotesandtablesfont\theauthoraffiliations}
+      %
+      \typesetjournal
+      \typesettitle
+      \typesetauthors
+      \typesetauthoraffiliations 
+}% end \maketitle
+
+
+
+% Floats
+%
+%\newenvironment{fullwidthfloat}
+%    {
+%        \begin{fullwidth}   
+%           \hspace*{\fullwidthmarginoverhang}
+%           \begin{minipage}{\pagewidth}
+%    }
+%    %
+%    {
+%            \end{minipage}
+%        \end{fullwidth}
+%    }
+
+% Watermark.
+\RequirePackage[%
+angle=270,
+fontsize=14pt,
+text=This\ paper\ has\ not\ been\ peer-reviewed,
+hpos=0.98\paperwidth,
+vpos=0.33\paperheight,
+hanchor=r,
+vanchor=t,
+]{draftwatermark}
+
+
+
+
+
+
+%%   See Tufte code.
+\input{full-width-float} %xxx bring in code
+
+%
+%
+%
+%  end Wiley
+%%xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+
+
+
+
+
+
