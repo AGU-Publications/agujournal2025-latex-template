@@ -1,0 +1,219 @@
+\documentclass[published]{agujournal2025_4.22.25}
+
+
+\begin{document}
+
+
+\journalname{Journal name}
+
+% Your title can be multiple lines long.
+\title{Title of your paper}
+
+
+\authors{%
+                  Your First Author Name\affil{their author footnote number, e.g., 1 or 1,2}\thanks{their additional affilation address and/or funding information},
+	          % Repeat the above for each author, with commas between authors, e.g.:
+                  Your Second Author Name\affil{their author footnote number, e.g., 2 or 2,3}\thanks{their affiliation address and/or funding information}
+	      }
+	      
+
+% Repeat for all authors:	      
+\affiliation{1}{their affiliation when they (co-)wrote the paper} % First argument is their footnote number, as above.
+
+
+
+% Corresponding author. Do not prepend with ``SI Corresponding author: '' in published version.
+\authoraddr{%
+                      % e.g., their full name, their department, their academic institution, their building, their City, State, Zip, Country. (theiremail\@ their institution)
+                      Corresponding author name, address, etc.
+                   }
+
+
+
+\authorrunninghead{Ignored.} % Ignored.
+
+% Key points.  
+%   Takes three arguments.  Remember to specifiy them all, using {} for no item.
+%
+\keypoints%
+% {}{}{}
+%    % First key point, etc.
+    {Key point 1}{Key point 2}{Key point 3}
+%    {Summarize the main points and conclusions of the article}
+%    {Each must be 140 characters or fewer with no special characters or punctuation and must be complete sentences}
+
+% Call after \authors.
+
+% Title running heads will be ignored, too:
+\titlerunninghead{Ignored.}
+
+% Key points was here
+
+\maketitle
+
+
+% Two options for abstracts: one with an abstract only and one with a plain language summary included.
+%
+%\begin{abstract}
+%    Abstract text body.
+%\end{abstract}
+
+
+\bigskip  % Remove; for demo purposes only.
+% OR:
+
+\begin{abstract}
+    Abstract text body with some more content.
+    %
+     \begin{plainlanguagesummary}
+            Plain language summary text body with some more content.
+     \end{plainlanguagesummary}
+     %
+     % Do not put more abstract text body here!
+\end{abstract}
+
+
+\section{Section Name}  % Or first section name if you have not introduction.
+
+Section text.
+
+
+\subsection{Subsection Name}
+
+Subsection text.
+
+
+\subsubsection{Subsubsection Name}
+
+
+\paragraph{Paragraph Name}
+Paragraph text.
+%
+% No paragraph space here unless really starting a new paragrah.
+
+New paragraph.
+%
+% Use description environment for definition lists.
+\begin{description}
+    \item[First] First description.
+    \item[Second] Second description
+\end{description}
+
+Section text.
+% No paragraph space here unless really starting a new paragrah.
+ \begin{equation}
+ x^2=y^2 + z^2
+ \end{equation}
+Section text.
+%
+\begin{enumerate}
+    \item List item text.
+        \begin{enumerate} % Can nest lists.
+          \item List item text.
+          \item List item text.
+        \end{enumerate}
+    \item List item text.
+\end{enumerate}
+% No paragraph space here unless really starting a new paragrah.
+Section text.
+% No paragraph space here unless really starting a new paragrah.
+\begin{itemize}
+    \item List item text.
+        \begin{itemize}
+          \item List item text. 
+          \item List item text.
+        \end{itemize}
+    \item List item text.
+\end{itemize}
+% No paragraph space here unless really starting a new paragrah.
+Section text.
+
+ShortCite CitekeyArticle \cite{CitekeyArticle}, ShortCiteA CitekeyBook \citeA{CitekeyBook}. 
+
+\textsf{This is the sans serif font.}
+
+ \texttt{This is the mono font.}
+ 
+ % Footnotes will generate an error on the page and in the console.
+
+% Program code:
+\begin{verbatim}  
+   This is verbatim text where macro names are shown rather than expanded, e.g., \LaTeX.
+\end{verbatim}
+
+Section text.
+
+
+
+%% Figures can float away from where you insert them.
+%%
+%\begin{figure}[h]
+%    \includegraphics[width=\textwidth]{figure-textwidth.png}
+%    \caption{Figure caption.}
+%\end{figure}
+%
+%% Figures too wide for the text width will go off the right edge.
+%\begin{figure*}
+%        \includegraphics[width=41pc]{figure-wide.pdf} 
+%        \caption{Figure caption.}
+%\end{figure*}%{fullwidthfloat}
+
+Section text.
+
+
+% You do not have to change the table numbers.  That's automagic.
+%    RE: \settablenum{S1} % Change number for each table
+
+% Tables that are wider than the text width will run off the right side.
+% You can also make fancier tables.
+\begin{table}
+\caption{Table caption.}
+\centering
+\begin{tabular}{l c}
+    \hline
+        Run  & Time (min)  \\
+   \hline
+      $l1$  & 260   \\
+      $l2$  & 300   \\
+      $l3$  & 340   \\
+    \hline
+\end{tabular}
+\tablenotetext{a}{Table footnote text here.}  %xxx ditto    %xxxx table footnote, not just footnote
+\end{table}
+
+Section text.
+
+
+% Your Data Availability Statement is an unnumbered section right before the bibliography.
+\section*{Open Research Statement}
+
+Statement text.
+
+
+
+% Bibliography
+%\cite{*} % If you have uncited bibliography items.
+%
+\bibliography{wiley} % Replace ``wiley'' with your bibliography's file name.  Do not specify its extension, e.g., .bib.
+
+
+
+% Appendix sections are numbered differently than article ones.
+\appendix  % Put this first.
+
+% Can repeat for each appendix.
+\section{Appendix 1}
+Appendix text.
+
+% You can use subsection, etc.
+\subsection{Appendix 1 Subsection}
+Appendix text.
+
+
+
+\end{document}
+
+
+
+
+
